@@ -1,0 +1,4 @@
+# Ignore such files. #
+*.dll
+*.exe
+*.o
