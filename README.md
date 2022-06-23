@@ -1,6 +1,6 @@
 <h1 align="center">Платформа для работы библиотеки</h1>
 
-<h2 align="center">Удобная навигация по проекту</h2>
+<h2 align="center"><a name="Начало">Удобная навигация по проекту</a></h2>
 <ol type="1" align="justify">
   <li><a href="#Краткое_описание_идеи_проекта">Краткое описание идеи проекта</a></li>
   <li><a href="#Краткое_описание_предметной_области">Краткое описание предметной области</a></li>
@@ -101,3 +101,5 @@
   <li><em>СУБД</em> &mdash; <strong>PostgreSQL</strong>.</li>
   <li><em>среда разработки</em> &mdash; <strong>Visual Studio 2022</strong>.</li>
 <ul>
+
+<p align="center"><a href="#Начало"> :point_up: В начало :point_up: </a></p>
