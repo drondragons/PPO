@@ -91,6 +91,10 @@
 </figure>
 
 <h2 align="center"><a name="ER_диаграмма">ER-диаграмма сущностей</a></h2>
+<figure>
+  <img src="https://github.com/drondragons/PPO/blob/main/diagrams/ERDiagramm.png" align="center" alt="ER диаграмма"></img>
+  <p align="center"><em>ER диаграмма</em></p>
+</figure>
 
 <h2 align="center"><a name="Архитектурные_характеристики">Архитектурные характеристики, важные для проекта</a></h2>
 <p align="justify">Возможность работы с наиболее распространенными СУБД. Данное требование обусловлено необходимостью обеспечить работу с уже созданными базами данных библиотек.</p>
