@@ -106,4 +106,4 @@
   <li><em>среда разработки</em> &mdash; <strong>Visual Studio 2022</strong>.</li>
 <ul>
 <hr>
-<p align="center"><a href="#Начало">В начало :point_up_2:</a></p>
+<p align="center"><a href="#Начало" title="переход на начало README">В начало :point_up_2:</a></p>
