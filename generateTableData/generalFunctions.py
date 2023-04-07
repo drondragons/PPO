@@ -13,24 +13,24 @@ class GeneralFunctions:
             makedirs(dir_path)
 
         except:
-            raise OSError(f"\nНе удалось создать папку {dir_path!r}!\n\
-Проверьте название папки или права доступа!\n")
+            raise OSError(f'\nНе удалось создать папку {dir_path!r}!\n\
+Проверьте название папки или права доступа!\n')
 
 
     @staticmethod
     def chooseMenuPoint(file_path):
         answer = int(0)
-        menu = f"Выберите вариант ответа:\
+        menu = f'Выберите вариант ответа:\
 \n\t1. Пересоздать файл {file_path!r};\
 \n\t2. Оставить файл без изменений.\
-\n\nНомер варианта ответа: "
+\n\nНомер варианта ответа: '
         try:
             answer = int(input(menu))
-            print("="*60)
+            print('='*60)
         except:
-            raise ValueError(f"\nЗначение ответа должно быть целым числом!\n")
+            raise ValueError(f'\nЗначение ответа должно быть целым числом!\n')
         
         if not 1 <= answer <= 2:
-            raise ValueError("\nВыбран неизвестный пункт!\n")
+            raise ValueError('\nВыбран неизвестный пункт!\n')
 
         return answer

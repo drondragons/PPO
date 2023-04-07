@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass
 
 from AttributeValidator import Validator
+from generalFunctions import GeneralFunctions
 from scrapper import ScrapperCultureRU, DEFAULT_HEADERS
 
 
@@ -15,15 +16,15 @@ class Author:
     initials: str = Validator(str, [Validator.exist_validator,
                                     Validator.match_validator,
                                     Validator.length_validator],
-                              1, 50, "^[а-яА-ЯёЁ\-]+ [а-яА-ЯёЁ\-]+$")
+                              1, 50, '^[а-яА-ЯёЁ\-]+ [а-яА-ЯёЁ\-]+$')
     birth_date: str = Validator(str, [Validator.exist_validator,
                                       Validator.symbols_validator,
                                       Validator.length_validator],
-                                5, 10, "[^\d\.]")
+                                5, 10, '[^\d\.]')
     death_date: Union[str, None] = None
     photo_path: str = Validator(str, [Validator.exist_validator,
                                       Validator.match_validator],
-                                regex="^\.\.\/TableData\/AuthorsPhoto\/[а-яА-ЯёЁ\-\_]+\.png$")
+                                regex='^\.\.\/TableData\/AuthorsPhoto\/[0-9а-яА-ЯёЁ\-\_]+\.png$')
     biography: str = Validator(str, [Validator.exist_validator])
 
 
@@ -37,7 +38,13 @@ class ScrapperAuthors(ScrapperCultureRU):
 
 
     def get_author_initials(self, soup):
-        return super().get_entity_header(soup)
+        initials = super().get_entity_header(soup)
+        if initials.find(' (') != -1:
+            initials = initials[:initials.find(' (')]
+            
+        initials = '{1} {0}'.format(*initials.split(' '))
+        
+        return initials
     
 
     def get_author_date(self, soup):
@@ -64,11 +71,15 @@ class ScrapperAuthors(ScrapperCultureRU):
         
 
     def get_author_photo_path(self, soup, name):
+        index = 1
         name = name.replace(' ', '_')
+        path = f'{self.authors_photo_dir}/{name}_1.png'
+        while GeneralFunctions.is_existFile(path):
+            index += 1
+            path = f'{self.authors_photo_dir}/{name}_{index}.png'
+            
         url = soup.find('img')['src']
-        
         photo = self.session.get(url).content
-        path = f'{self.authors_photo_dir}/{name}.png'
         with open(path, 'wb') as f:
             f.write(photo)
 
@@ -98,18 +109,21 @@ class ScrapperAuthors(ScrapperCultureRU):
         
             
     def get_authors(self):
+        if not GeneralFunctions.is_existFile(self.authors_photo_dir):
+            GeneralFunctions.createDir(self.authors_photo_dir)
+        
         authors = list()
         urls = super().get_entities_urls(self.subdir)
         for url in urls:
             author = self.get_author(url)
             authors.append(author)
-
+        
         return authors
     
 
 class AuthorsGenerator:
     class_type = Author
-    file_path = "../TableData/Authors.csv"
+    file_path = '../TableData/Authors.csv'
 
 
     def __init__(self):

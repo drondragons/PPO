@@ -53,16 +53,16 @@ class ScrapperCultureRU(Scrapper):
 
 
     def get_entities_urls(self, subdir):
-        items_urls = set()
+        items_urls = list()
         
         url = self.baseurl + subdir
-        pages = self.get_pages_amount(subdir.format(page=1))
+        pages = self.get_pages_amount(subdir.format(page=1)) + 1
         for page in range(1, pages):
             response = self.session.get(url.format(page=page))
             
             soup = BeautifulSoup(response.text, self.DEFAULT_PARSER)
             soup = soup.find_all('div', class_='entity-cards_item col')
-            items_urls.update(self.get_page_entities_urls(soup))
+            items_urls.extend(self.get_page_entities_urls(soup))
             
         return items_urls
 
