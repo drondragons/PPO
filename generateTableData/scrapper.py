@@ -57,7 +57,7 @@ class ScrapperCultureRU(Scrapper):
         
         url = self.baseurl + subdir
         pages = self.get_pages_amount(subdir.format(page=1)) + 1
-        for page in range(1, pages):
+        for page in range(1, 2):#pages):
             response = self.session.get(url.format(page=page))
             
             soup = BeautifulSoup(response.text, self.DEFAULT_PARSER)
@@ -90,7 +90,7 @@ class ScrapperCultureRU(Scrapper):
         for attribute in attributes:
             label = attribute.find('div', class_='attributes_label').text
             if label == entity_attribute:
-                value = attribute.find_all('div', class_='attributes_value')
+                value = attribute.find_all(class_='attributes_value')
                 value = [replace_html_spaces(el.text) for el in value]
                 break
 
