@@ -1,5 +1,6 @@
 import re
 import math
+import datetime
 from ebooklib import epub
 from bs4 import BeautifulSoup
 from functions import Functions
@@ -48,8 +49,8 @@ class ScrapperLiterature(ScrapperCultureRU):
         return Functions.swap_name_surname(author)
 
 
-    def get_annotation(self, soup):
-        return super().get_entity_annotation(soup)
+    def get_annotation(self, soup, title):
+        return super().get_entity_annotation(soup) if soup else f'Аннотация к произведению «{title}» по умолчанию.'
 
 
     def get_ebook_link(self, soup):
@@ -60,6 +61,7 @@ class ScrapperLiterature(ScrapperCultureRU):
 
     def save_ebook(self, url, title):
         title = title.replace(' ', '_')
+        title = re.sub('[^а-яА-Яa-zA-Z0-9\_]', '', title)
         src = f'{self.epub_dir}/{title}' + '_{index}.epub'
         path = Functions.get_unused_path(src)
         
@@ -108,8 +110,8 @@ class ScrapperLiterature(ScrapperCultureRU):
                 result['annotation'] = super().get_paragraphs(paragraphs)
         
         if generic_right:
-            year = re.sub('[^0-9]\-', '', generic_right.text).split('–')[-1]
-            result['writing_year'] = int(year)
+            year = re.sub('[^0-9\–]', '', generic_right.text).split('–')[-1]
+            result['writing_year'] = int(year) if year and int(year) < datetime.date.today().year else None
 
         generic_rights = soup_annotation.find_all(class_='generic_right')
         for generic_right in generic_rights:
@@ -119,7 +121,7 @@ class ScrapperLiterature(ScrapperCultureRU):
             else:
                 result['publisher'] = right[right.find('«') + 1:right.find('»')]
                 result['publishing_year'] = int(right[re.search(r'\d', right).start():])
-
+        
         return result
         
 
@@ -151,7 +153,7 @@ class ScrapperLiterature(ScrapperCultureRU):
         tags = set(self.get_tags(aside))
         isbn = self.get_isbn(about_entity)
         title = self.get_title(about_entity)
-        description = self.get_annotation(content)
+        description = self.get_annotation(content, title)
         genre = set(self.get_genre(about_entity))
         ebook = self.get_ebook(about_entity, title)
         author = self.get_author(about_entity)
@@ -176,15 +178,18 @@ class ScrapperLiterature(ScrapperCultureRU):
         
 
     def get_literature(self):
+        self.get_default_photo()
+        print('\nСкачана книжная обложка по умолчанию.\n')
+        
         books = list()
+        print(f'\nПолучение данных о литературе с сайта {self.baseurl!r}.\n')
         urls = super().get_entities_urls(self.subdir)
         for url in urls:
             book = self.get_record(url)
             books.append(book)
-
+        print(f'\nПолучение данных о литературе с сайта {self.baseurl!r} завершено.\n')
         return books
 
-        # urls = ['https://www.culture.ru/books/965/beseda-pyanogo-s-trezvym-chertom',
-        #         'https://www.culture.ru/books/242/gore-ot-uma',
-        #         'https://www.culture.ru/books/178/evgenii-onegin',
-        #         'https://www.culture.ru/books/52/dubrovskii']
+
+    def get_data(self):
+        return self.get_literature()

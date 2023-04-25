@@ -3,7 +3,7 @@ from validation import Validator
 from dataclasses import dataclass
 
 
-regex_books_epub_path = '^\.\.\/TableData\/BooksPhoto\/[0-9а-яА-ЯёЁ\-\_]+\.epub$'
+regex_books_epub_path = '^\.\.\/TableData\/BooksEpub\/[0-9а-яА-ЯёЁa-zA-Z\-\_]+\.epub$'
 
 
 @dataclass(frozen=True)

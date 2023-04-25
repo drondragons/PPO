@@ -37,13 +37,8 @@ class ScrapperCultureRU(Scrapper):
 
 
     def get_page_entities_urls(self, entities):
-        urls = list()
-        for entity in entities:
-            url = DEFAULT_CULTURE_URL + entity.find('a', class_='card-cover')['href']
-            urls.append(url)
-            
-        return urls
-
+        return [DEFAULT_CULTURE_URL + entity.find('a', class_='card-cover')['href'] for entity in entities]
+        
 
     def get_entities_urls(self, subdir):
         items_urls = list()
@@ -62,33 +57,29 @@ class ScrapperCultureRU(Scrapper):
 
     def get_entity_header(self, soup):
         header = soup.find('h1', class_='about-entity_title entity-title').text
-        return Functions.replace_html_spaces(header)
+        return Functions.replace_html_symbols(header)
     
     
     def get_paragraphs(self, soup):
         annotation = str()
         for paragraph in soup:
             annotation += paragraph.text + '\\n'
-        return Functions.replace_html_spaces(annotation)
+        return Functions.replace_html_symbols(annotation)
     
 
     def get_entity_annotation(self, soup):
-        annotation = str()
-        
         content_body = soup.find('div', class_='styled-content_body')
-        paragraphs = content_body.find_all('p')
-        return self.get_paragraphs(paragraphs)
+        return self.get_paragraphs(content_body.find_all('p'))
 
 
     def get_entity_attribute(self, soup, entity_attribute):
         value = list()
-        
         attributes = soup.find_all('div', class_='attributes_block')
         for attribute in attributes:
             label = attribute.find('div', class_='attributes_label').text
             if label == entity_attribute:
                 value = attribute.find_all(class_='attributes_value')
-                value = [Functions.replace_html_spaces(el.text) for el in value]
+                value = [Functions.replace_html_symbols(el.text) for el in value]
                 break
-
+            
         return value

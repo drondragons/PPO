@@ -1,9 +1,11 @@
+import random
+import datetime
 from faker import Faker
+
 from dt_book import Book
-from datetime import date
-from random import randint, choice
 from generator_abstract import DataGenerator
 from generator_publishers import PublishersGenerator
+
 from csv_handler_dataclass import CSVHandler_dataclass
 
 
@@ -13,23 +15,20 @@ class BooksGenerator(DataGenerator):
 
 
     def generate_amount(self):
-        return randint(5, 20)
+        return random.randint(5, 20)
 
 
     def generate_price(self):
-        return randint(500, 2000)
+        return random.randint(500, 2000)
 
 
     def generate_publishing_year(self, year):
-        return year if year else date.today().year - 1
+        return int(year) if year else datetime.date.today().year - 1
 
 
     def generate_library_location(self):
-        room_number = choice(['В первом', 'Во втором', 'В третьем',
-                              'В четвёртом', 'В пятом'])
-        bookcase_number = choice(['в первом', 'во втором', 'в третьем',
-                                  'в четвёртом'])
-
+        room_number = random.choice(['В первом', 'Во втором', 'В третьем', 'В четвёртом', 'В пятом'])
+        bookcase_number = random.choice(['в первом', 'во втором', 'в третьем', 'в четвёртом'])
         return f'{room_number} зале,{bookcase_number} шкафу'
 
 
@@ -49,6 +48,9 @@ class BooksGenerator(DataGenerator):
         handler = CSVHandler_dataclass(PublishersGenerator().path, PublishersGenerator().class_type)
         publishers = handler.get_csv_data()
 
+        if not publisher:
+            publisher = random.choice(publishers).name
+            
         index = self.find_publisher_id(publisher, publishers)
         if not index:
             country_id = publishers[0].country_id
@@ -61,11 +63,15 @@ class BooksGenerator(DataGenerator):
 
         return index[0]
     
+    
+    def generate_pages(self, pages):
+        return int(pages)
+    
                 
     def generate_book(self, item):
         return Book(title=item['title'],
                     isbn=self.generate_isbn(item['isbn']),
-                    total_pages=item['pages'],
+                    total_pages=self.generate_pages(item['pages']),
                     amount=self.generate_amount(),
                     publishing_year=self.generate_publishing_year(item['publishing_year']),
                     publisher_id=self.generate_publisher_id(item['publisher']),
@@ -80,7 +86,7 @@ class BooksGenerator(DataGenerator):
         for item in container:
             book = self.generate_book(item)
             books.append(book)
-
+            
         return books
 
     def generate(self, container=list()):

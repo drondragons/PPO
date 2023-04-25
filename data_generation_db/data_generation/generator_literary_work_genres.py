@@ -1,8 +1,12 @@
+from functions import Functions
+
 from generator_genres import GenresGenerator
 from generator_abstract import DataGenerator
 from dt_literary_work_genre import LiteraryWorkGenre
-from csv_handler_dataclass import CSVHandler_dataclass
 from generator_literary_works import LiteraryWorksGenerator
+
+from csv_handler_dataclass import CSVHandler_dataclass
+
 
 
 class LiteraryWorkGenresGenerator(DataGenerator):
@@ -12,7 +16,7 @@ class LiteraryWorkGenresGenerator(DataGenerator):
 
     def generate_literary_work_genre(self, index, title, container, genres):
         result = list()
-        genre = [r for record in container if record['title'] == title for r in record['genre']]
+        genre = [r for record in container if record['title'] == title for r in Functions.convert_str_to_list(record['genre'])]
         for i, item in enumerate(genres, 1):
             result += [LiteraryWorkGenre(index, i) for el in genre if el == item.title]
             

@@ -1,6 +1,9 @@
-from functions import Functions
+from functions import Functions, AnswerError
+
 from scrapper_authors import ScrapperAuthors
 from scrapper_literature import ScrapperLiterature
+
+from csv_handler_dict import CSVHandler_dict
 from csv_handler_dataclass import CSVHandler_dataclass
 
 from generator_users import UsersGenerator
@@ -19,65 +22,10 @@ from generator_literary_work_genres import LiteraryWorkGenresGenerator
 from generator_author_literary_work import AuthorLiteraryWorksGenerator
 
 
-def is_need_scrapper(generator):
-    return type(generator) in [BooksGenerator,
-                               LiteraryWorksGenerator,
-                               GenresGenerator,
-                               AuthorsGenerator]
-
-
 def is_literature_scrapper(generator):
-    return type(generator) in [BooksGenerator,
-                               LiteraryWorksGenerator,
-                               GenresGenerator,
-                               BookLiteraryWorksGenerator,
-                               LiteraryWorkGenresGenerator,
-                               AuthorLiteraryWorksGenerator]
-
-
-def need_to_scrap(generator, is_scrap, authors_records, literature_records):
-    if (not is_scrap) and (is_need_scrapper(generator)):
-        authors_records.extend(ScrapperAuthors().get_authors())
-        literature_records.extend(ScrapperLiterature().get_literature())
-        is_scrap = True
-
-    return is_scrap
-    
-
-def create_table(generator, is_scrap, authors_records, literature_records):
-    container = list()
-    
-    is_scrap = need_to_scrap(generator, is_scrap, authors_records, literature_records)
-
-    if isinstance(generator, AuthorsGenerator):
-        container = authors_records
-    elif is_literature_scrapper(generator):
-        container = literature_records
-
-    generator.generate(container)
-    
-    csv_handler_dataclass = CSVHandler_dataclass(generator.path, generator.class_type)
-    csv_handler_dataclass.write_csv(generator.container)
-
-    return is_scrap
-      
-
-def create_tables(generators):
-    is_scrap = False
-    authors_records = literature_records = list()
-    for item in generators:
-        generator = item()
-        if not Functions.is_exist_file(generator.path):
-            is_scrap = create_table(generator, is_scrap, authors_records, literature_records)
-            print(f'\nФайл {generator.path!r} создан и заполнен!\n')
-        
-        else:
-            answer = Functions.choose_menu_point(generator.path)
-            if answer == 1:
-                is_scrap = create_table(generator, is_scrap, authors_records, literature_records)
-                print(f'\nФайл {generator.path!r} пересоздан и заполнен!\n')
-
-    print('\nВсе файлы созданы и заполнены!\n')
+    return type(generator) in [BooksGenerator, LiteraryWorksGenerator,
+                               GenresGenerator, BookLiteraryWorksGenerator,
+                               LiteraryWorkGenresGenerator, AuthorLiteraryWorksGenerator]
 
 
 def check_dir_existence(dirs):
@@ -86,40 +34,87 @@ def check_dir_existence(dirs):
             Functions.create_dir(path)
 
 
+def is_need_to_recreate(file):
+    return (not Functions.is_exist_file(file)) or (Functions.choose_menu_point(file) == 1)
+
+
+def run_scrappers(scrappers):
+    for scrapper, file in scrappers.items():
+        if is_need_to_recreate(file):
+            data = scrapper().get_data()
+            CSVHandler_dict(file, data[0].keys()).write_csv(data)
+     
+     
+def run_generators(generators, scrappers):
+    handler = CSVHandler_dict(scrappers[ScrapperAuthors])
+    authors_records = handler.get_csv_data(is_header=True)
+    
+    handler = CSVHandler_dict(scrappers[ScrapperLiterature])
+    literature_records = handler.get_csv_data(is_header=True)
+    
+    for generator in generators:
+        generator = generator()
+        if is_need_to_recreate(generator.path):
+            records = list()
+            if isinstance(generator, AuthorsGenerator):
+                records = authors_records
+            elif is_literature_scrapper(generator):
+                records = literature_records
+            
+            generator.generate(records)
+            
+            handler = CSVHandler_dataclass(generator.path, generator.class_type)
+            handler.write_csv(generator.container)
+            
+            print(f'\nФайл {generator.path!r} создан и заполнен!\n')
+        
+    print('\nВсе файлы созданы и заполнены!\n')
+        
+        
+            
 def main():
     dirs = ['../TableData',
             '../TableData/AuthorsPhoto',
             '../TableData/BooksPhoto',
-            '../TableData/BooksEpub']
+            '../TableData/BooksEpub',
+            '../TableData/WebsiteRecords']
+    
+    scrappers = {ScrapperAuthors: '../TableData/WebsiteRecords/authors_records.csv',
+                 ScrapperLiterature: '../TableData/WebsiteRecords/literarture_records.csv'}
+    
+    generators = [RolesGenerator, StatusesGenerator,
+                  CountriesGenerator, LanguagesGenerator,
+                  UsersGenerator, PublishersGenerator,
+                  AuthorsGenerator, GenresGenerator,
+                  BooksGenerator, LiteraryWorksGenerator,
+                  LiteraryWorkGenresGenerator, AuthorLiteraryWorksGenerator,
+                  BookLiteraryWorksGenerator, BookRecordsGenerator]
+    
     try:
         check_dir_existence(dirs)
         
-        generators = [RolesGenerator, StatusesGenerator,
-                      CountriesGenerator, LanguagesGenerator,
-                      UsersGenerator, PublishersGenerator,
-                      AuthorsGenerator, GenresGenerator,
-                      BooksGenerator, LiteraryWorksGenerator,
-                      LiteraryWorkGenresGenerator,
-                      AuthorLiteraryWorksGenerator,
-                      BookLiteraryWorksGenerator,
-                      BookRecordsGenerator]
-        create_tables(generators)
+        run_scrappers(scrappers)
+        run_generators(generators, scrappers)
         
     except OSError as error:
+        print(f'\nНе удалось создать папку \'{error}\'!\n\
+Проверьте название папки или права доступа!\n')
+        
+    except AnswerError as error:
         print(error)
         
-    except ValueError as error:
-        print(error)
-
-    except TypeError as error:
-        print(error)
+    except ValueError:
+        print('\nЗначение ответа должно быть целым числом!\n')
     
+    except KeyboardInterrupt:
+        print('\nПрограмма остановлена сочетанием клавиш <CTRL + C>!\n')
+        
     except Exception as error:
         print(error)
-        
+    
     finally:
         input()
-
+    
         
 if __name__ == '__main__':
     main()

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 regex_authors_initials = '^[а-яА-ЯёЁ\-]+ [а-яА-ЯёЁ\-]+$'
-regex_authors_photos_path = '^\.\.\/TableData\/AuthorsPhoto\/[0-9а-яА-ЯёЁ\-\_]+\.(png|jpg|jpeg)$'
+regex_authors_photos_path = '^\.\.\/TableData\/AuthorsPhoto\/[0-9а-яА-ЯёЁa-zA-Z\-\_]+\.(png|jpg|jpeg)$'
 
 
 @dataclass(frozen=True)

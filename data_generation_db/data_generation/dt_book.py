@@ -9,7 +9,7 @@ regex_books_photos_path = '^\.\.\/TableData\/BooksPhoto\/[0-9а-яА-ЯёЁa-zA-
 @dataclass(frozen=True)
 class Book:
       title: str = Validator(str, [Validator.exist_validator])
-      isbn: str = Validator(str, [Validator.exist_validator, Validator.symbols_validator, Validator.length_validator], 17, 17, '[^\d\-]')
+      isbn: str = Validator(str, [Validator.exist_validator, Validator.symbols_validator, Validator.length_validator], 15, 17, '[^\d\-]')
       total_pages: int = Validator(int, [Validator.exist_validator, Validator.interval_validator], 4)
       amount: int = Validator(int, [Validator.exist_validator, Validator.interval_validator], 0)
       publishing_year: int = Validator(int, [Validator.exist_validator, Validator.interval_validator], 1500, date.today().year)

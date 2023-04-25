@@ -7,10 +7,14 @@ class AuthorsGenerator(DataGenerator):
         super().__init__(path, class_type)
 
 
+    def generate_death_date(self, date):
+        return date if date else ''
+
+
     def generate_author(self, item):
         return Author(initials=item['initials'],
                       birth_date=item['birth_date'],
-                      death_date=item['death_date'],
+                      death_date=self.generate_death_date(item['death_date']),
                       photo_path=item['photo_path'],
                       biography=item['biography'])
         

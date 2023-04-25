@@ -17,9 +17,9 @@ class LiteraryWorksGenerator(DataGenerator):
         writing_year = item['writing_year']
         if not writing_year:
             year = [author.death_date for author in authors if author.initials == item['author']]
-            writing_year = int(year[0].split('.')[-1]) - 1 if year[0] else date.today().year - 1
-
-        return writing_year
+            writing_year = int(year[0].split('.')[-1]) - 1 if year else date.today().year - 1
+            
+        return int(writing_year)
         
 
     def generate_literary_work(self, item):

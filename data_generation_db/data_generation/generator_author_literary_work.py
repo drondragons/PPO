@@ -12,10 +12,9 @@ class AuthorLiteraryWorksGenerator(DataGenerator):
         
     def generate_author_literary_work(self, index, initials, container, literary_works):
         result = list()
-        literary_work = [record['title'] for record in container if record['author'] == initials]
+        literary_work = [record['path'] for record in container if record['author'] == initials]
         for i, item in enumerate(literary_works, 1):
-            result += [AuthorLiteraryWork(index, i) for el in literary_work if el == item.title]
-
+            result += [AuthorLiteraryWork(index, i) for el in literary_work if el == item.ebook_path]
         return result
         
         

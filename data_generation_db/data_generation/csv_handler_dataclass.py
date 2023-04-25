@@ -33,4 +33,4 @@ class CSVHandler_dataclass(ICSVHandler):
         
         
     def add_data_in_csv(self, input_data):
-        self.write_csv([input_data], 'a', True)
+        self.write_csv(input_data, 'a', True)
