@@ -9,7 +9,7 @@ regex_authors_photos_path = '^\.\.\/TableData\/AuthorsPhoto\/[0-9а-яА-ЯёЁa
 @dataclass(frozen=True)
 class Author:
       initials: str = Validator(str, [Validator.exist_validator, Validator.match_validator, Validator.length_validator], 1, 50, regex_authors_initials)
-      birth_date: str = Validator(str, [Validator.exist_validator, Validator.symbols_validator, Validator.length_validator], 5, 10, '[^\d\.]')
+      birth_date: str = Validator(str)
       death_date: str = Validator(str)
       photo_path: str = Validator(str, [Validator.exist_validator, Validator.match_validator], regex=regex_authors_photos_path)
       biography: str = Validator(str, [Validator.exist_validator])

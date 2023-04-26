@@ -14,9 +14,10 @@ class LiteraryWorkGenresGenerator(DataGenerator):
         super().__init__(path, class_type)
 
 
-    def generate_literary_work_genre(self, index, title, container, genres):
+    def generate_literary_work_genre(self, index, ebook_path, container, genres):
         result = list()
-        genre = [r for record in container if record['title'] == title for r in Functions.convert_str_to_list(record['genre'])]
+        
+        genre = [r for record in container if record['path'] == ebook_path for r in record['genre']]
         for i, item in enumerate(genres, 1):
             result += [LiteraryWorkGenre(index, i) for el in genre if el == item.title]
             
@@ -32,7 +33,7 @@ class LiteraryWorkGenresGenerator(DataGenerator):
         
         literary_work_genres = list()
         for i, literary_work in enumerate(literary_works, 1):
-            literary_work_genre = self.generate_literary_work_genre(i, literary_work.title, container, genres)
+            literary_work_genre = self.generate_literary_work_genre(i, literary_work.ebook_path, container, genres)
             literary_work_genres.extend(literary_work_genre)
             
         return literary_work_genres

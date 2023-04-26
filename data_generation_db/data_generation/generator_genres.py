@@ -26,7 +26,6 @@ class GenresGenerator(DataGenerator):
     def generate_genres(self, container):
         genres = list()
         for record in container:
-            record['genre'] = Functions.convert_str_to_list(record['genre'])
             genre = self.generate_genre(record['genre'], genres)
             genres.extend(genre)
             

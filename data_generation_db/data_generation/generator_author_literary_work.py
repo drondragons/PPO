@@ -27,6 +27,8 @@ class AuthorLiteraryWorksGenerator(DataGenerator):
         
         author_literary_works = list()
         for i, author in enumerate(authors, 1):
+            if author.initials == 'Толстой Алексей' and author.death_date == '23.02.1945':
+                continue
             author_literary_work = self.generate_author_literary_work(i, author.initials, container, literary_works)
             author_literary_works.extend(author_literary_work)
             

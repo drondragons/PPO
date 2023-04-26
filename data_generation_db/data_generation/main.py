@@ -43,14 +43,20 @@ def run_scrappers(scrappers):
         if is_need_to_recreate(file):
             data = scrapper().get_data()
             CSVHandler_dict(file, data[0].keys()).write_csv(data)
+   
+   
+def format_records(records, key, func):
+    for record in records:
+        record[key] = func(record[key])
      
      
 def run_generators(generators, scrappers):
     handler = CSVHandler_dict(scrappers[ScrapperAuthors])
     authors_records = handler.get_csv_data(is_header=True)
-    
+
     handler = CSVHandler_dict(scrappers[ScrapperLiterature])
     literature_records = handler.get_csv_data(is_header=True)
+    format_records(literature_records, 'genre', Functions.convert_str_to_list)
     
     for generator in generators:
         generator = generator()

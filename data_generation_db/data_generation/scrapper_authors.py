@@ -1,4 +1,4 @@
-from dateparser import parse
+import dateparser
 from bs4 import BeautifulSoup
 from functions import Functions
 from scrapper import ScrapperCultureRU, DEFAULT_HEADERS
@@ -48,9 +48,9 @@ class ScrapperAuthors(ScrapperCultureRU):
         delim = date_value.find('-') - 1
         end = delim if delim > age else age
         
-        birth_date = parse(date_value[:end]).strftime('%d.%m.%Y')
+        birth_date = dateparser.parse(date_value[:end]).strftime('%d.%m.%Y')
         if delim == end:
-            death_date = parse(date_value[delim+3:]).strftime('%d.%m.%Y')
+            death_date = dateparser.parse(date_value[delim+3:]).strftime('%d.%m.%Y')
         
         return birth_date, death_date
         
