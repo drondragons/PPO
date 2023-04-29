@@ -1,11 +1,14 @@
 import random
 import datetime
+
 from dt_book_record import BookRecord
+
 from generator_roles import RolesGenerator
 from generator_users import UsersGenerator
 from generator_books import BooksGenerator
 from generator_abstract import DataGenerator
 from generator_statuses import StatusesGenerator
+
 from csv_handler_dataclass import CSVHandler_dataclass
 
 
@@ -94,8 +97,7 @@ class BookRecordsGenerator(DataGenerator):
         return result
             
         
-    def generate_book_record_on_hands(self, readers, statuses, books_in_library, book_records):
-        book_record = random.choice(book_records)
+    def generate_book_record_on_hands(self, readers, statuses, books_in_library, book_record):
         book = self.find_book_by_book_id(books_in_library, book_record.book_id)
         
         status = 0
@@ -111,20 +113,28 @@ class BookRecordsGenerator(DataGenerator):
             status = statuses.get('возвращено')
             book_amount = -book_record.book_amount
         
-        r = self.generate_book_record_on_hand(user_id, book, status, book_record, book_amount)
-        
-        return r
+        return self.generate_book_record_on_hand(user_id, book, status, book_record, book_amount)
         
                 
     def generate_book_records_on_hands(self, users, statuses, books_in_library, book_records):
         readers = users.get('читатель')
         iterations = random.randint(len(books_in_library), len(books_in_library) * 2)
         for _ in range(iterations):
-            book_records.extend(self.generate_book_record_on_hands(readers, statuses, books_in_library, book_records))
+            book_records_for_choice = book_records.copy()
+            book_record = random.choice(book_records_for_choice)
+            book_records_for_choice.remove(book_record)
+            book_records.extend(self.generate_book_record_on_hands(readers, statuses, books_in_library, book_record))
+        
+        return book_records
         
         
     def find_added_books(self, books, records):
-        return [book for record in records for book in books if record.book_id == book[0]]
+        return [book for record in records for book in books if record.book_id == book[0]]   
+        
+    
+    @staticmethod    
+    def sort_date(book_record):
+        return datetime.datetime.strptime(book_record.date, '%H:%M:%S %d.%m.%Y')     
         
         
     def generate_book_records(self, users, statuses, books):
@@ -132,8 +142,10 @@ class BookRecordsGenerator(DataGenerator):
         result = self.generate_book_records_on_add(users, statuses, books, date)
         
         records = self.find_added_books(books, result)
-        self.generate_book_records_on_hands(users, statuses, records, result)
+        result = self.generate_book_records_on_hands(users, statuses, records, result)
         
+        result.sort(key=BookRecordsGenerator.sort_date)
+
         return result
         
         

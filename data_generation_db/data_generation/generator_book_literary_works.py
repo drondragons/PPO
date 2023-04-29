@@ -1,12 +1,14 @@
 import random
-from dt_book import Book
-from generator_books import BooksGenerator
+
+from csv_handler_dataclass import CSVHandler_dataclass
+
+from dt_book_literary_work import BookLiteraryWork
+
 from generator_genres import GenresGenerator
 from generator_abstract import DataGenerator
 from generator_authors import AuthorsGenerator
-from dt_book_literary_work import BookLiteraryWork
+from generator_books import BooksGenerator, Book
 from generator_publishers import PublishersGenerator
-from csv_handler_dataclass import CSVHandler_dataclass
 from generator_literary_works import LiteraryWorksGenerator
 from generator_literary_work_genres import LiteraryWorkGenresGenerator
 from generator_author_literary_work import AuthorLiteraryWorksGenerator
@@ -69,9 +71,9 @@ class BookLiteraryWorksGenerator(DataGenerator):
         return collections
             
             
-    def generate_book_literary_work(self, index):
-        return BookLiteraryWork(book_id=index, 
-                                literary_work_id=index)
+    def generate_book_literary_work(self, book_id, literary_work_id):
+        return BookLiteraryWork(book_id=book_id, 
+                                literary_work_id=literary_work_id)
 
     
     def generate_title(self, title):
@@ -88,7 +90,7 @@ class BookLiteraryWorksGenerator(DataGenerator):
     
     
     def generate_annotation(self, records, title):
-        names = ', '.join([record['title'] for record in records])
+        names = ', '.join([f"«{record['title']}»" for record in records])
         return f'Аннотация к сборнику «{title}» по умолчанию.\\nКнига содержит следующие произведения: {names}.'
  
  
@@ -112,7 +114,6 @@ class BookLiteraryWorksGenerator(DataGenerator):
     def find_literary_work_index(self, record):
         handler = CSVHandler_dataclass(LiteraryWorksGenerator().path, LiteraryWorksGenerator().class_type)
         literary_works = handler.get_csv_data()
-        
         return [index for index, literary_work in enumerate(literary_works, 1) if record['title'] == literary_work.title][0]
         
             
@@ -120,8 +121,10 @@ class BookLiteraryWorksGenerator(DataGenerator):
         book = self.generate_book(collection)
         
         handler = CSVHandler_dataclass(BooksGenerator().path, BooksGenerator().class_type)
-        handler.add_data_in_csv([book])
         books = handler.get_csv_data()
+        if book not in books:
+            handler.add_data_in_csv([book])
+            books = handler.get_csv_data()
         
         result = list()
         for record in collection[1][1]:
@@ -172,12 +175,40 @@ class BookLiteraryWorksGenerator(DataGenerator):
         
         genres_records = self.find_entities_records(genres_for_collection, container, 'genre')
         genres_collections = self.find_entities_records_for_collection(genres_records)
-        return self.generate_collections(genres_collections) 
+        return self.generate_collections(genres_collections)
+    
+    
+    def get_author(self, book):
+        return book.title.split('.')[0]
+    
+    
+    def get_titles(self, book):
+        return book.annotation[:-2].split(': ', 1)[1].split('», ')
+    
+    
+    def generate_record(self, book_id, container, author, title):
+        index = [index for index, record in enumerate(container, 1) if (record['author'] == author or author in record['genre']) and record['title'] == title][0]
+        return self.generate_book_literary_work(book_id, index)
+    
+     
+    def generate_records(self, container):
+        result = [self.generate_book_literary_work(i, i) for i, _ in enumerate(container, 1)]
+    
+        handler = CSVHandler_dataclass(BooksGenerator().path, BooksGenerator().class_type)
+        books = handler.get_csv_data()
+        
+        books_len = len(books)
+        container_length = len(container)
+        for index in range(container_length, books_len, 1):
+            author = self.get_author(books[index])
+            titles = self.get_titles(books[index])
+            result += [self.generate_record(index+1, container, author, title[1:]) for title in titles]
+    
+        return result
      
 
     def generate_book_literary_works(self, container):
-        result = list()
-        result.extend([self.generate_book_literary_work(i) for i, _ in enumerate(container, 1)])
+        result = self.generate_records(container)
         
         result.extend(self.generate_collection_by_author(container))
         

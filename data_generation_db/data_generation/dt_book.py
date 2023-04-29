@@ -6,7 +6,7 @@ from dataclasses import dataclass
 regex_books_photos_path = '^\.\.\/TableData\/BooksPhoto\/[0-9а-яА-ЯёЁa-zA-Z\-\_]+\.(png|jpg|jpeg)$'
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class Book:
       title: str = Validator(str, [Validator.exist_validator])
       isbn: str = Validator(str, [Validator.exist_validator, Validator.symbols_validator, Validator.length_validator], 15, 17, '[^\d\-]')
