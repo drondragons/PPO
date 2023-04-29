@@ -57,7 +57,7 @@ class ScrapperAuthors(ScrapperCultureRU):
 
     def get_photo_path(self, soup, name):
         name = name.replace(' ', '_')
-        src = f'{self.authors_photo_dir}/{name}' + '_{index}.png'
+        src = f'{self.photo_dir}/{name}' + '_{index}.png'
         path = Functions.get_unused_path(src)
         
         url = soup.find('img')['src']
