@@ -51,6 +51,7 @@ class ScrapperCultureRU(Scrapper):
             soup = BeautifulSoup(response.text, self.DEFAULT_PARSER)
             soup = soup.find_all('div', class_='entity-cards_item col')
             items_urls.extend(self.get_page_entities_urls(soup))
+            items_urls = list(set(items_urls))
             
         return items_urls
 

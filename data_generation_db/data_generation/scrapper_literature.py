@@ -13,6 +13,8 @@ DEFAULT_BOOKS_URL = 'https://www.culture.ru/literature/books'
 class ScrapperLiterature(ScrapperCultureRU):
     subdir = '?page={page}&limit=24&query=&sort=-views'
     
+    urls_file = 'book_urls.txt'
+    
     epub_dir = '../TableData/BooksEpub'
     photo_dir = '../TableData/BooksPhoto'
 
@@ -100,17 +102,18 @@ class ScrapperLiterature(ScrapperCultureRU):
                                      self.DEFAULT_PARSER)
                 chapter = soup.find('body')
                 result['pages'] += self.get_pages(chapter)
-                generic_right = soup.find(class_='generic_right')
+                generic_right = soup.find_all(class_='generic_right')
 
             if item.get_name() == 'Text/annotation.xhtml':
                 soup_annotation = BeautifulSoup(item.get_content(),
                                                 self.DEFAULT_PARSER)
-                
                 paragraphs = soup_annotation.find_all(class_='generic')
                 result['annotation'] = super().get_paragraphs(paragraphs)
-        
-        if generic_right:
-            year = re.sub('[^0-9\–]', '', generic_right.text).split('–')[-1]
+
+        last_generic = chapter.find_all(class_='generic')
+        right = generic_right[-1] if generic_right else last_generic[-1] if last_generic else None
+        if right:
+            year = re.sub('[^0-9\–]', '', right.text).split('–')[-1]
             result['writing_year'] = int(year) if year and int(year) < datetime.date.today().year else None
 
         generic_rights = soup_annotation.find_all(class_='generic_right')
@@ -175,7 +178,14 @@ class ScrapperLiterature(ScrapperCultureRU):
                 'writing_year': ebook['writing_year'],
                 'publishing_year': ebook['publishing_year'],
                 'cover_path': self.default_book_cover_photo}
-        
+    
+    
+    def get_book_urls(self) -> list:
+        urls = list()
+        with open(self.urls_file, 'r') as f:
+            urls = f.read().splitlines()
+        return urls
+
 
     def get_literature(self):
         self.get_default_photo()
@@ -183,7 +193,7 @@ class ScrapperLiterature(ScrapperCultureRU):
         
         books = list()
         print(f'\nПолучение данных о литературе с сайта {self.baseurl!r}.\n')
-        urls = super().get_entities_urls(self.subdir)
+        urls = self.get_book_urls()
         for url in urls:
             book = self.get_record(url)
             books.append(book)

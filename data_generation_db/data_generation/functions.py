@@ -34,12 +34,22 @@ class Functions:
                    '-': r'[-‑—–]+',
                    '...': r'[…]+',
                    '': r'[¬]+',
-                   '"': r'[""]+',
                    '«': r'[“]+',
-                   '»': r'[”]+'}
-        for key, value, in symbols.items():
+                   '»': r'[”]+',
+                   'е': r'[ё]+',
+                   'Е': r'[Ё]+'}
+        for key, value in symbols.items():
             src = Functions.replace(value, key, src)
-        return src
+
+        out = str()
+        is_find = False
+        for c in src:
+            if c == '"':
+                c = '»' if is_find else '«'
+                is_find = not is_find
+            out += c
+                
+        return out
     
 
     @staticmethod

@@ -109,8 +109,8 @@ def main():
     except AnswerError as error:
         print(error)
         
-    except ValueError:
-        print('\nЗначение ответа должно быть целым числом!\n')
+    except ValueError as error:
+        print(error)
     
     except KeyboardInterrupt:
         print('\nПрограмма остановлена сочетанием клавиш <CTRL + C>!\n')

@@ -19,11 +19,11 @@ class LiteraryWorksGenerator(DataGenerator):
         authors = handler.get_csv_data()
 
         writing_year = item['writing_year']
-        if not writing_year:
+        if (not writing_year) or (writing_year and int(writing_year) <= 1500):
             year = [author.death_date for author in authors if author.initials == item['author']]
-            writing_year = int(year[0].split('.')[-1]) - 1 if year else date.today().year - 1
+            writing_year = int(year[0].split('.')[-1]) - 1 if year else str()
             
-        return int(writing_year)
+        return str(writing_year) if writing_year else str()
         
         
     def generate_biography(self, initials):

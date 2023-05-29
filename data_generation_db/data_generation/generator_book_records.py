@@ -50,7 +50,7 @@ class BookRecordsGenerator(DataGenerator):
                           book_id=book_id,
                           book_status_id=status,
                           book_amount=book_amount,
-                          date=date.strftime('%H:%M:%S %d.%m.%Y'))
+                          date=date.strftime('%d.%m.%Y %H:%M:%S'))
         
         
     def generate_date(self, date):
@@ -84,7 +84,7 @@ class BookRecordsGenerator(DataGenerator):
     
     def generate_book_record_on_hand(self, user_id, book, status, book_record, book_amount):
         result = list()
-        date = self.generate_date(datetime.datetime.strptime(book_record.date, '%H:%M:%S %d.%m.%Y'))
+        date = self.generate_date(datetime.datetime.strptime(book_record.date, '%d.%m.%Y %H:%M:%S'))
         if 0 <= book[2] - book_amount <= book[1].amount:
             if status not in ['забронировано', 'отменено бронирование']:
                 book[2] -= book_amount            
@@ -92,7 +92,7 @@ class BookRecordsGenerator(DataGenerator):
                                  book_id=book[0],
                                  book_status_id=status,
                                  book_amount=abs(book_amount),
-                                 date=date.strftime('%H:%M:%S %d.%m.%Y'))]
+                                 date=date.strftime('%d.%m.%Y %H:%M:%S'))]
         
         return result
             
@@ -134,7 +134,7 @@ class BookRecordsGenerator(DataGenerator):
     
     @staticmethod    
     def sort_date(book_record):
-        return datetime.datetime.strptime(book_record.date, '%H:%M:%S %d.%m.%Y')     
+        return datetime.datetime.strptime(book_record.date, '%d.%m.%Y %H:%M:%S')     
         
         
     def generate_book_records(self, users, statuses, books):
