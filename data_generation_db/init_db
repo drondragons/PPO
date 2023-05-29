@@ -1,0 +1,12 @@
+#!/bin/bash
+
+server=localhost
+username=postgres
+dbname=city_library
+
+psql -h $server -d postgres -U $username -f 'sql_scripts/drop_db.sql'
+psql -h $server -d postgres -U $username -f 'sql_scripts/create_db.sql'
+psql -h $server -d $dbname -U $username -f 'sql_scripts/create_dt.sql'
+psql -h $server -d $dbname -U $username -f 'sql_scripts/create_constraints.sql'
+psql -h $server -d $dbname -U $username -f 'sql_scripts/create_functions.sql'
+psql -h $server -d $dbname -U $username -f 'sql_scripts/insert_data.sql'

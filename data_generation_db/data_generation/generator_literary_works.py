@@ -1,5 +1,3 @@
-from datetime import date
-
 from dt_literary_work import LiteraryWork
 from generator_abstract import DataGenerator
 from generator_authors import AuthorsGenerator, Author
@@ -32,8 +30,8 @@ class LiteraryWorksGenerator(DataGenerator):
         
     def generate_author(self, initials):
         return Author(initials=initials,
-                      birth_date='',
-                      death_date='',
+                      birth_date=str(),
+                      death_date=str(),
                       photo_path=ScrapperAuthors.default_author_photo,
                       biography=self.generate_biography(initials))
         
@@ -57,6 +55,10 @@ class LiteraryWorksGenerator(DataGenerator):
         handler = CSVHandler_dataclass(AuthorsGenerator().path, AuthorsGenerator().class_type)
         authors = handler.get_csv_data()
         
+        for author in authors:
+            if 'validation' in author.death_date:
+                author.death_date = str()
+                
         literary_works = list()
         for item in container:
             literary_work = self.generate_literary_work(item, authors)

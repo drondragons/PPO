@@ -8,7 +8,7 @@ class AuthorsGenerator(DataGenerator):
 
 
     def generate_death_date(self, date):
-        return date if date else ''
+        return date if date else str()
 
 
     def generate_author(self, item):

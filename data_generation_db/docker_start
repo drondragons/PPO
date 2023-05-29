@@ -1,0 +1,6 @@
+#!/bin/bash
+
+docker build -t city_library_image .
+docker run -d --name city_library_container -p 5433:5433 city_library_image
+docker start city_library_container
+docker exec -it city_library_container bash

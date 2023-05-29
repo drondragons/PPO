@@ -3,7 +3,7 @@ from re import findall, match
 
 class Validator:
     def __init__(self, class_type, validators=(), minimum=0, maximum=0,
-                 regex=''):
+                 regex=str()):
         self.regex = regex
         self.minimum = minimum
         self.maximum = maximum

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker stop city_library_container
+docker rm city_library_container
+docker rmi city_library_image
